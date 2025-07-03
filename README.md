@@ -33,6 +33,40 @@ This project is a **DIY sneaker information website** that:
 ---
 
 ## 📂 Project Structure
+```
+.
+├── main.py # FastAPI backend
+├── sneakers.db # Your SQLite sneaker database
+└── index.html # Frontend
+```
+---
 
+## ⚡ Usage
+
+### 1️⃣ Start the FastAPI server:
+```bash
+uvicorn main:app --reload
+The API will be accessible at:
+
+http://127.0.0.1:8000/query
+```
+### 2️⃣ Serve the frontend:
+
+```
+python -m http.server 8000
+Visit:
+
+http://127.0.0.1:8000/index.html
+```
+🧩 Example Queries
+"Show all Nike sneakers released in 2023"
+
+"Display all sneakers under $200"
+
+"List Adidas basketball sneakers"
+
+The website will:
+✅ Display generated SQL
+✅ Show matching sneaker results with images
 
 ![screenshot](/images/Screenshot.png)
