@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>All Sneakers</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            background: #f0f0f0;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 15px;
+            max-width: 1200px;
+            margin: auto;
+        }
+
+        .card {
+            background: white;
+            border-radius: 8px;
+            padding: 10px;
+            text-align: center;
+            box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .card img {
+            width: 100%;
+            border-radius: 4px;
+        }
+
+        .card h3 {
+            font-size: 16px;
+            margin: 8px 0 4px;
+        }
+
+        .card p {
+            margin: 2px 0;
+            font-size: 14px;
+        }
+
+        #sqlContainer {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin: 15px auto;
+            max-width: 90%;
+        }
+
+        #sqlDisplay {
+            background: #222;
+            color: #0f0;
+            padding: 10px;
+            border-radius: 5px;
+            flex: 1;
+            overflow-x: auto;
+        }
+
+        #copyButton {
+            padding: 8px 12px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>All Sneakers</h1>
+    <input type="text" id="queryInput" placeholder="Enter your query (e.g., show Nike shoes from 2023)"
+        style="width:80%;padding:8px;">
+    <button onclick="runQuery()" style="padding:8px;">Query</button>
+    <div id="sqlContainer">
+        <pre id="sqlDisplay">Generated SQL will appear here.</pre>
+        <button id="copyButton" onclick="copySQL()">Copy SQL</button>
+    </div>
+    <div id="grid" class="grid"></div>
+    <script>
+        async function runQuery() {
+            const userQuery = document.getElementById("queryInput").value;
+            document.getElementById("grid").innerHTML = "<p>Loading...</p>";
+            const response = await fetch("http://127.0.0.1:8000/query", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ query: userQuery })
+            });
+            const data = await response.json();
+            document.getElementById("sqlDisplay").innerText = data.sql || "No SQL generated.";
+            renderSneakers(data.result || []);
+        }
+        function renderSneakers(sneakers) {
+            const grid = document.getElementById("grid");
+            grid.innerHTML = "";
+            if (sneakers.length === 0) {
+                grid.innerHTML = "<p>No sneakers found.</p>";
+                return;
+            }
+            sneakers.forEach(sneaker => {
+                const card = document.createElement("div");
+                card.className = "card";
+                card.innerHTML = `
+            <img src="${sneaker.image}" alt="${sneaker.name}" onerror="this.src='https://via.placeholder.com/200x150?text=No+Image';">
+            <h3>${sneaker.name}</h3>
+            <p><strong>Brand:</strong> ${sneaker.brand}</p>
+            <p><strong>Retail:</strong> $${sneaker.retail}</p>
+            <p><strong>Release Date:</strong> ${sneaker.releaseDate}</p>
+        `;
+                grid.appendChild(card);
+            });
+        }
+        function copySQL() {
+            const sqlText = document.getElementById("sqlDisplay").innerText;
+            navigator.clipboard.writeText(sqlText).then(() => {
+                alert("SQL copied to clipboard!");
+            }, () => {
+                alert("Failed to copy SQL.");
+            });
+        }
+    </script>
+</body>
+
+</html>
